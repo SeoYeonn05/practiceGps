@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentManager
 import com.google.android.gms.maps.*
 
 import com.google.android.gms.maps.model.LatLng
@@ -15,6 +16,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 
 class MapsFragment : Fragment(), OnMapReadyCallback {   //  OnMapReadyCallback 상속
     private lateinit var mView: MapView
+    private lateinit var googleMap: GoogleMap
     lateinit var name:String
     lateinit var latLng: LatLng
 
@@ -22,13 +24,15 @@ class MapsFragment : Fragment(), OnMapReadyCallback {   //  OnMapReadyCallback �
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val mapView = inflater.inflate(R.layout.fragment_maps, null)
+        val mapView = inflater.inflate(R.layout.fragment_maps, container, false)
 
         //  try catch로 맵이 null이 아닌지 확인 필요
 
+
         mView=mapView.findViewById(R.id.map)
         mView.onCreate(savedInstanceState)
-        mView.getMapAsync { this } // 구글맵을 불러오는 함수, this->MapsFragment->OnMapReadyCallback->onMapready()로 들어감
+        mView.getMapAsync(this) // 구글맵을 불러오는 함수, this->MapsFragment->OnMapReadyCallback->onMapready()로 들어감
+
         return mapView
     }
 
@@ -41,10 +45,12 @@ class MapsFragment : Fragment(), OnMapReadyCallback {   //  OnMapReadyCallback �
         // 마커 출력 (자신의 위치: circle, 스팟의 위치: marker로 표시 필요)
 //        var markerCircle: CircleOptions = CircleOptions()   // circle 생성
 //                                            .center(location) //  circle의 중심
-
         googleMap.addMarker(MarkerOptions()
             .position(location)
             .title("first location"))    //  지도에 Marker 표시
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f)) // 좌표변수와 줌의 정도 지정
+
+        googleMap.uiSettings.isZoomGesturesEnabled  //   줌 기능 활성화
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f)) // 좌표변수와 줌의 정도 지정, 현재 위치로 이동
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(15f))    //  줌 레벨 설정(굳이 두 개나 있어야 될까?)
     }
 }

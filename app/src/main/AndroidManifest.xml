@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="kr.ac.tukorea.practicegps" >
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -9,11 +10,13 @@
 
     <application
         android:allowBackup="true"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.PracticeGPS" >
+        android:theme="@style/Theme.PracticeGPS"
+        tools:targetApi="m">
 
         <!--
              TODO: Before you run your application, you need a Google Maps API key.

@@ -22,6 +22,7 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import kr.ac.tukorea.practicegps.MapsFragment
 
 class MainActivity : AppCompatActivity() {
@@ -36,8 +37,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        //supportFragmentManager.beginTransaction().replace(R.id.fragment, MapsFragment()).commit()
 
     }
 
