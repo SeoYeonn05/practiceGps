@@ -1,17 +1,18 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:fillViewport="true"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <fragment
-        class="com.google.android.gms.maps.SupportMapFragment"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:id="@+id/map_fragment"
+    <FrameLayout
+        android:id="@+id/mainframe"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
-</FrameLayout>
+        android:layout_height="match_parent">
+        <fragment
+            android:id = "@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:name = "com.naver.maps.map.MapFragment"/>
+    </FrameLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,50 +3,103 @@ package kr.ac.tukorea.practicegps
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.location.Location
 import android.os.Bundle
-import android.util.AttributeSet
-import android.view.View
-import android.widget.Button
+import android.os.PersistableBundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
-import androidx.fragment.app.FragmentTransaction
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CircleOptions
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import kr.ac.tukorea.practicegps.MapsFragment
+import com.naver.maps.map.*
+import com.naver.maps.map.overlay.Marker
+import com.naver.maps.map.overlay.Overlay
+import com.naver.maps.map.overlay.OverlayImage
+import com.naver.maps.map.util.FusedLocationSource
 
-class MainActivity : AppCompatActivity() {
-    private lateinit var fusedLocationClient: FusedLocationProviderClient // 위치값 사용
-    //FusedLocationProviderClient API 사용시 GPS 신호 및 와이파이와 통신사 네트워크 위치를 결합해 최소한의 배터리 사용량으로 빠르고 정확한 위치 검색
-    private lateinit var locationCallback: LocationCallback //  위치값 요청에 대한 갱신 정보를 받아옴
 
-    private lateinit var fragmentManager: FragmentManager
-    private lateinit var fragmentMap: MapsFragment
-    private lateinit var transaction: FragmentTransaction
+class MainActivity : AppCompatActivity(), com.naver.maps.map.OnMapReadyCallback{
+
+    private lateinit var fusedLocationClient:FusedLocationProviderClient
+    private lateinit var naverMap: NaverMap
+    private lateinit var locationSource: FusedLocationSource
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
 
+        setFrag()
     }
 
-//    private fun setFragment(){
-//        fragmentManager=supportFragmentManager
-//        transaction=fragmentManager.beginTransaction()
-//
-//        transaction.replace(R.id.main_view, fragmentMap).commit()
-//
-//    }
+    private fun setFrag() {
+        val mapFragment = supportFragmentManager.findFragmentById(R.id.map) as MapFragment?
+            ?:MapFragment.newInstance().also {
+                supportFragmentManager.beginTransaction().add(R.id.map, it).commit()
+            }
+
+        mapFragment.getMapAsync(this)
+    }
 
 
+    override fun onMapReady(naverMap: NaverMap){
+
+        this.naverMap = naverMap
+        val uiSettings = naverMap.uiSettings
+        // 맵 첫 시작 카메라 위치
+        val latLng =com.naver.maps.geometry.LatLng(37.349741467772, 126.76182486561)
+
+        // 맵 타입
+        naverMap.mapType = NaverMap.MapType.Navi
+        naverMap.setLayerGroupEnabled(NaverMap.LAYER_GROUP_BICYCLE, true)
+
+        // 맵 시작 위치와 줌 설정
+        val cameraUpdate = CameraUpdate.scrollAndZoomTo(latLng, 11.0)
+            .animate(CameraAnimation.Easing)
+        naverMap.moveCamera(cameraUpdate)
+
+        //대여소 위치 추가
+        addMarkers(naverMap)
+
+        // 내 위치 받기
+        uiSettings.isLocationButtonEnabled = true
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            this.naverMap = naverMap
+
+            locationSource = FusedLocationSource(this ,
+                LOCATION_PERMISSION_REQUEST_CODE
+            )
+            naverMap.locationSource = locationSource
+            naverMap.locationTrackingMode = LocationTrackingMode.Face
+        } else{
+            Toast.makeText(this, "권한을 설정하세요", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private val places: List<LocationXY> by lazy{
+        ReadLocationXY(this).read()
+    }
+
+    private fun addMarkers(naverMap: NaverMap){
+        places.forEach{ place ->
+            var marker = Marker()
+            marker.position = com.naver.maps.geometry.LatLng(
+                place.location.latitude,
+                place.location.longitude)
+            //marker.icon = OverlayImage.fromResource(R.drawable.))
+            marker.map=naverMap
+
+        }
+    }
+    companion object{
+        private const val LOCATION_PERMISSION_REQUEST_CODE = 1000
+    }
 }
